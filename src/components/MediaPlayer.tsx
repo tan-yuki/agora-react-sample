@@ -7,8 +7,8 @@ import {
 } from "agora-rtc-sdk-ng";
 
 export interface MediaPlayerProps {
-  audioTrack: ILocalAudioTrack | IRemoteAudioTrack;
-  videoTrack: ILocalVideoTrack | IRemoteVideoTrack;
+  audioTrack: ILocalAudioTrack | IRemoteAudioTrack | undefined;
+  videoTrack: ILocalVideoTrack | IRemoteVideoTrack | undefined;
 }
 
 export function MediaPlayer(props: MediaPlayerProps) {
@@ -21,10 +21,10 @@ export function MediaPlayer(props: MediaPlayerProps) {
       return;
     }
 
-    videoTrack.play(container.current);
+    videoTrack?.play(container.current);
 
     return () => {
-      videoTrack.stop();
+      videoTrack?.stop();
     };
   }, [videoTrack]);
 
@@ -33,10 +33,10 @@ export function MediaPlayer(props: MediaPlayerProps) {
       return;
     }
 
-    audioTrack.play();
+    audioTrack?.play();
 
     return () => {
-      audioTrack.stop();
+      audioTrack?.stop();
     };
   }, [audioTrack]);
 

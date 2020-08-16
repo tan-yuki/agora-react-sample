@@ -2,15 +2,20 @@ import React, { useEffect, useState } from "react";
 import { createAgoraClient } from "../services/createClient";
 import { APP_ID } from "../config";
 import { useMicrophoneAndCameraTracks } from "../hooks/useMicrophoneAndCameraTracks";
-import { ILocalAudioTrack, ILocalVideoTrack } from "agora-rtc-sdk-ng";
+import {
+  ILocalAudioTrack,
+  ILocalVideoTrack,
+  IAgoraRTCRemoteUser,
+} from "agora-rtc-sdk-ng";
 import { MediaPlayer } from "./MediaPlayer";
+import { useRemoteUsers } from "../hooks/useRemoteUsers";
 
 const channelName = "test-channel";
+const client = createAgoraClient("host");
 
 export function App() {
-  const client = createAgoraClient("host");
+  const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
   const [localAudioTrack, localVideoTrack] = useMicrophoneAndCameraTracks();
-
   const [alreadyJoined, setJoinState] = useState(false);
 
   useEffect(() => {
@@ -18,9 +23,19 @@ export function App() {
       audioTrack: ILocalAudioTrack,
       videoTrack: ILocalVideoTrack
     ) {
-      // TODO: tokenを指定
-      await client.join(APP_ID, channelName, null);
+      await client.join(
+        APP_ID,
+        channelName,
+        // TODO: tokenを指定
+        null,
+        // TODO: ユーザーIDを擬似生成
+        Math.random().toString(32).substring(2)
+      );
       await client.publish([audioTrack, videoTrack]);
+
+      // joinしたあとにsdk側でclientにRemoteUsersがセットされるため
+      // このタイミングで改めてremoteUsersの状態を更新する
+      setRemoteUsers(client.remoteUsers);
       setJoinState(true);
     }
 
@@ -30,15 +45,32 @@ export function App() {
         console.log(e);
       });
     }
-  }, [client, alreadyJoined, localAudioTrack, localVideoTrack]);
+  }, [alreadyJoined, localAudioTrack, localVideoTrack, setRemoteUsers]);
 
   if (!localAudioTrack || !localVideoTrack) {
     return <p>Loading...</p>;
   }
 
+  const remoteMediaPlayers = remoteUsers.map((user: IAgoraRTCRemoteUser) => {
+    return (
+      <MediaPlayer
+        key={`remote-${user.uid}`}
+        audioTrack={user.audioTrack}
+        videoTrack={user.videoTrack}
+      />
+    );
+  });
+
   return (
-    <div className="App">
-      <MediaPlayer audioTrack={localAudioTrack} videoTrack={localVideoTrack} />
+    <div>
+      <div className="App">
+        <MediaPlayer
+          key="local"
+          audioTrack={localAudioTrack}
+          videoTrack={localVideoTrack}
+        />
+      </div>
+      {remoteMediaPlayers}
     </div>
   );
 }
