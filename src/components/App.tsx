@@ -27,9 +27,7 @@ export function App() {
         APP_ID,
         channelName,
         // TODO: tokenを指定
-        null,
-        // TODO: ユーザーIDを擬似生成
-        Math.random().toString(32).substring(2)
+        null
       );
       await client.publish([audioTrack, videoTrack]);
 
