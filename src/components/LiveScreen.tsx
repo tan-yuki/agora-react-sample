@@ -8,8 +8,9 @@ import {
   ILocalTrack,
   ClientRole,
 } from "agora-rtc-sdk-ng";
-import { MediaPlayer } from "./MediaPlayer";
 import { useRemoteUsers } from "../hooks/useRemoteUsers";
+import { MyMediaPlayer } from "./MediaPlayer/MyMediaPlayer";
+import { RemoteMediaPlayer } from "./MediaPlayer/RemoteMediaPlayer";
 interface LiveScreenProps {
   client: IAgoraRTCClient;
   channelName: string;
@@ -86,20 +87,24 @@ export function LiveScreen(props: LiveScreenProps) {
     return <p>Loading...</p>;
   }
 
-  const remoteMediaPlayers = remoteUsers.map((user: IAgoraRTCRemoteUser) => {
-    return (
-      <MediaPlayer
-        key={`remote-${user.uid}`}
-        audioTrack={user.audioTrack}
-        videoTrack={user.videoTrack}
-      />
-    );
-  });
+  const remoteMediaPlayers = remoteUsers
+    .filter((user: IAgoraRTCRemoteUser) => {
+      return user.audioTrack || user.videoTrack;
+    })
+    .map((user: IAgoraRTCRemoteUser) => {
+      return (
+        <RemoteMediaPlayer
+          key={`remote-${user.uid}`}
+          audioTrack={user.audioTrack}
+          videoTrack={user.videoTrack}
+        />
+      );
+    });
 
   return (
     <div>
-      <MediaPlayer
-        key="local"
+      <MyMediaPlayer
+        clientRole={clientRole}
         audioTrack={localAudioTrack}
         videoTrack={localVideoTrack}
       />

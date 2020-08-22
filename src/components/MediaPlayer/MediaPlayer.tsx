@@ -4,15 +4,19 @@ import {
   ILocalVideoTrack,
   IRemoteAudioTrack,
   IRemoteVideoTrack,
+  ClientRole,
 } from "agora-rtc-sdk-ng";
+import { TrackType } from "../../model/TrackType";
 
 export interface MediaPlayerProps {
+  trackType: TrackType;
+  clientRole: ClientRole;
   audioTrack: ILocalAudioTrack | IRemoteAudioTrack | undefined;
   videoTrack: ILocalVideoTrack | IRemoteVideoTrack | undefined;
 }
 
 export function MediaPlayer(props: MediaPlayerProps) {
-  const { audioTrack, videoTrack } = props;
+  const { trackType, audioTrack, videoTrack, clientRole } = props;
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -29,6 +33,13 @@ export function MediaPlayer(props: MediaPlayerProps) {
   }, [videoTrack]);
 
   useEffect(() => {
+    // 自分の音声ストリームは流さない。
+    // 自分の音声ストリームを流してしまうと、自分の声が跳ね返って聞こえてしまい、
+    // 非常に使い勝手が悪くなってしまうため。
+    if (trackType === "local") {
+      return;
+    }
+
     if (!container.current) {
       return;
     }
@@ -38,7 +49,11 @@ export function MediaPlayer(props: MediaPlayerProps) {
     return () => {
       audioTrack?.stop();
     };
-  }, [audioTrack]);
+  }, [audioTrack, trackType]);
+
+  if (clientRole === "audience") {
+    return null;
+  }
 
   return (
     <div
