@@ -1,5 +1,7 @@
 ## Sample Project for Agora.io WebRTC Application
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/db0d3644-aa05-4c34-85c7-8d413c0ba680/deploy-status)](https://app.netlify.com/sites/suspicious-liskov-e31e26/deploys)
+
 ----
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
