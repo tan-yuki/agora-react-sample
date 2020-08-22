@@ -1,13 +1,5 @@
 ## Sample Project for Agora.io WebRTC Application
 
-### Setup
-
-```
-$ cp env.txt .env
-$ vi .env
-# Please edit .env file for your application.
-```
-
 ----
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

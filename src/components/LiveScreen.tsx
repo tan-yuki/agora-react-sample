@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { APP_ID } from "../config";
 import { useMicrophoneAndCameraTracks } from "../hooks/useMicrophoneAndCameraTracks";
 import {
   ILocalAudioTrack,
   ILocalVideoTrack,
   IAgoraRTCRemoteUser,
   IAgoraRTCClient,
+  ILocalTrack,
 } from "agora-rtc-sdk-ng";
 import { MediaPlayer } from "./MediaPlayer";
 import { useRemoteUsers } from "../hooks/useRemoteUsers";
-
 interface LiveScreenProps {
   client: IAgoraRTCClient;
   channelName: string;
+  appId: string;
 }
 
 export function LiveScreen(props: LiveScreenProps) {
-  const { client, channelName } = props;
+  const { client, channelName, appId } = props;
   const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
   const [localAudioTrack, localVideoTrack] = useMicrophoneAndCameraTracks();
   const [alreadyJoined, setJoinState] = useState(false);
@@ -27,7 +27,7 @@ export function LiveScreen(props: LiveScreenProps) {
       videoTrack: ILocalVideoTrack
     ) {
       await client.join(
-        APP_ID,
+        appId,
         channelName,
         // TODO: tokenを指定
         null
@@ -48,12 +48,24 @@ export function LiveScreen(props: LiveScreenProps) {
     }
   }, [
     client,
+    appId,
     channelName,
     alreadyJoined,
     localAudioTrack,
     localVideoTrack,
     setRemoteUsers,
   ]);
+
+  // Clean up effect
+  useEffect(() => {
+    return () => {
+      const tracks: ILocalTrack[] = [];
+      localAudioTrack && tracks.push(localAudioTrack);
+      localVideoTrack && tracks.push(localVideoTrack);
+      client.unpublish(tracks).then(() => client.leave());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!localAudioTrack || !localVideoTrack) {
     return <p>Loading...</p>;
