@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useMicrophoneAndCameraTracks } from "../hooks/useMicrophoneAndCameraTracks";
 import {
   ILocalAudioTrack,
@@ -8,7 +8,6 @@ import {
   ILocalTrack,
   ClientRole,
 } from "agora-rtc-sdk-ng";
-import { useRemoteUsers } from "../hooks/useRemoteUsers";
 import { MyMediaPlayer } from "./MediaPlayer/MyMediaPlayer";
 import { RemoteMediaPlayer } from "./MediaPlayer/RemoteMediaPlayer";
 interface LiveScreenProps {
@@ -16,13 +15,24 @@ interface LiveScreenProps {
   channelName: string;
   appId: string;
   clientRole: ClientRole;
+  remoteUsers: IAgoraRTCRemoteUser[];
+  alreadyJoined: boolean;
+  setJoinState: (state: boolean) => void;
+  setRemoteUsers: (users: IAgoraRTCRemoteUser[]) => void;
 }
 
 export function LiveScreen(props: LiveScreenProps) {
-  const { client, channelName, appId, clientRole } = props;
-  const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
+  const {
+    client,
+    channelName,
+    appId,
+    clientRole,
+    remoteUsers,
+    setRemoteUsers,
+    alreadyJoined,
+    setJoinState,
+  } = props;
   const [localAudioTrack, localVideoTrack] = useMicrophoneAndCameraTracks();
-  const [alreadyJoined, setJoinState] = useState(false);
 
   useEffect(() => {
     async function join(
@@ -65,6 +75,7 @@ export function LiveScreen(props: LiveScreenProps) {
     localAudioTrack,
     localVideoTrack,
     setRemoteUsers,
+    setJoinState,
   ]);
 
   // Clean up effect
@@ -74,11 +85,14 @@ export function LiveScreen(props: LiveScreenProps) {
       localAudioTrack && tracks.push(localAudioTrack);
       localVideoTrack && tracks.push(localVideoTrack);
 
-      // clientRoleがaudienceのときはストリームをpublishしていないため
-      // audienceのユーザーがunpublishをするとエラーになる。
-      // そのため、unpublishでエラーがでてもかならずleaveが実行されるように
-      // finallyとしている。
-      client.unpublish(tracks).finally(() => client.leave());
+      client
+        .unpublish(tracks)
+        // clientRoleがaudienceのときはストリームをpublishしていないため
+        // audienceのユーザーがunpublishをするとエラーになる。
+        // そのため、unpublishでエラーがでてもかならずleaveが実行されるように
+        // finallyとしている。
+        .finally(() => client.leave())
+        .finally(() => setJoinState(false));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

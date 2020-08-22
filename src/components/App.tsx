@@ -1,7 +1,8 @@
 import React, { useState, ChangeEvent, MouseEvent, useCallback } from "react";
 import { createAgoraClient } from "../services/createClient";
 import { LiveScreen } from "./LiveScreen";
-import { ClientRole } from "agora-rtc-sdk-ng";
+import { ClientRole, IAgoraRTCRemoteUser } from "agora-rtc-sdk-ng";
+import { useRemoteUsers } from "../hooks/useRemoteUsers";
 
 const client = createAgoraClient();
 
@@ -10,6 +11,8 @@ export function App() {
   const [appId, setAppId] = useState<string>("");
   const [channelName, setChannelName] = useState<string>("");
   const [clientRole, setClientRole] = useState<ClientRole>("host");
+  const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
+  const [alreadyJoined, setJoinState] = useState(false);
 
   const onChangeAppId = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -38,12 +41,36 @@ export function App() {
     setIsStarted(false);
   }, []);
 
+  const userIdList = [client.uid]
+    .concat(
+      remoteUsers.map((user: IAgoraRTCRemoteUser) => {
+        return user.uid;
+      })
+    )
+    .filter((_) => _);
+
+  const UserListComponent =
+    alreadyJoined && client.uid ? (
+      <div>
+        <p>User list</p>
+        <ul>
+          {userIdList.map((uid) => (
+            <li key={uid}>{uid}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
+
   const LiveScreenComponent = isStarted ? (
     <LiveScreen
       client={client}
       channelName={channelName}
       appId={appId}
       clientRole={clientRole}
+      remoteUsers={remoteUsers}
+      setRemoteUsers={setRemoteUsers}
+      alreadyJoined={alreadyJoined}
+      setJoinState={setJoinState}
     />
   ) : null;
 
@@ -99,7 +126,7 @@ export function App() {
           )}
         </form>
       </div>
-
+      <div>{UserListComponent}</div>
       <div>{LiveScreenComponent}</div>
     </div>
   );
