@@ -6,6 +6,7 @@ import {
   IAgoraRTCRemoteUser,
   IAgoraRTCClient,
   ILocalTrack,
+  ClientRole,
 } from "agora-rtc-sdk-ng";
 import { MediaPlayer } from "./MediaPlayer";
 import { useRemoteUsers } from "../hooks/useRemoteUsers";
@@ -13,10 +14,11 @@ interface LiveScreenProps {
   client: IAgoraRTCClient;
   channelName: string;
   appId: string;
+  clientRole: ClientRole;
 }
 
 export function LiveScreen(props: LiveScreenProps) {
-  const { client, channelName, appId } = props;
+  const { client, channelName, appId, clientRole } = props;
   const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
   const [localAudioTrack, localVideoTrack] = useMicrophoneAndCameraTracks();
   const [alreadyJoined, setJoinState] = useState(false);
@@ -26,13 +28,20 @@ export function LiveScreen(props: LiveScreenProps) {
       audioTrack: ILocalAudioTrack,
       videoTrack: ILocalVideoTrack
     ) {
+      client.setClientRole(clientRole);
+
       await client.join(
         appId,
         channelName,
         // TODO: tokenを指定
         null
       );
-      await client.publish([audioTrack, videoTrack]);
+
+      // 音声や映像ストリームをpublishするのは
+      // hostのみなので、clientRoleがhostのときのみpublishする
+      if (clientRole === "host") {
+        await client.publish([audioTrack, videoTrack]);
+      }
 
       // joinしたあとにsdk側でclientにRemoteUsersがセットされるため
       // このタイミングで改めてremoteUsersの状態を更新する
@@ -48,6 +57,7 @@ export function LiveScreen(props: LiveScreenProps) {
     }
   }, [
     client,
+    clientRole,
     appId,
     channelName,
     alreadyJoined,
@@ -62,7 +72,12 @@ export function LiveScreen(props: LiveScreenProps) {
       const tracks: ILocalTrack[] = [];
       localAudioTrack && tracks.push(localAudioTrack);
       localVideoTrack && tracks.push(localVideoTrack);
-      client.unpublish(tracks).then(() => client.leave());
+
+      // clientRoleがaudienceのときはストリームをpublishしていないため
+      // audienceのユーザーがunpublishをするとエラーになる。
+      // そのため、unpublishでエラーがでてもかならずleaveが実行されるように
+      // finallyとしている。
+      client.unpublish(tracks).finally(() => client.leave());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
