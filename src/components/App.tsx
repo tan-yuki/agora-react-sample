@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, MouseEvent } from "react";
+import React, { useState, ChangeEvent, MouseEvent, useCallback } from "react";
 import { createAgoraClient } from "../services/createClient";
 import { LiveScreen } from "./LiveScreen";
 import { ClientRole } from "agora-rtc-sdk-ng";
@@ -11,29 +11,32 @@ export function App() {
   const [channelName, setChannelName] = useState<string>("");
   const [clientRole, setClientRole] = useState<ClientRole>("host");
 
-  function onChangeAppId(e: ChangeEvent<HTMLInputElement>) {
+  const onChangeAppId = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setAppId(e.target.value);
-  }
+  }, []);
 
-  function onChangeChannelName(e: ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
-    setChannelName(e.target.value);
-  }
+  const onChangeChannelName = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      setChannelName(e.target.value);
+    },
+    []
+  );
 
-  function onChangeRole(e: ChangeEvent<HTMLInputElement>) {
+  const onChangeRole = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setClientRole(e.target.value === "host" ? "host" : "audience");
-  }
+  }, []);
 
-  function startLive(e: MouseEvent<HTMLButtonElement>) {
+  const startLive = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsStarted(true);
-  }
+  }, []);
 
-  function closeLive(e: MouseEvent<HTMLButtonElement>) {
+  const closeLive = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsStarted(false);
-  }
+  }, []);
 
   const LiveScreenComponent = isStarted ? (
     <LiveScreen
