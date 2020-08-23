@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { createAgoraClient } from "../services/createClient";
 import { LiveScreen } from "./LiveScreen";
-import { ClientRole, IAgoraRTCRemoteUser } from "agora-rtc-sdk-ng";
+import { ClientRole } from "agora-rtc-sdk-ng";
 import { useRemoteUsers } from "../hooks/useRemoteUsers";
 import { InitialSettingForm } from "./InitialSettingForm";
+import { UserList } from "./UserList";
 
 const client = createAgoraClient();
 
@@ -14,26 +15,6 @@ export function App() {
   const [clientRole, setClientRole] = useState<ClientRole>("host");
   const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
   const [alreadyJoined, setJoinState] = useState(false);
-
-  const userIdList = [client.uid]
-    .concat(
-      remoteUsers.map((user: IAgoraRTCRemoteUser) => {
-        return user.uid;
-      })
-    )
-    .filter((_) => _);
-
-  const UserListComponent =
-    alreadyJoined && client.uid ? (
-      <div>
-        <p>User list</p>
-        <ul>
-          {userIdList.map((uid) => (
-            <li key={uid}>{uid}</li>
-          ))}
-        </ul>
-      </div>
-    ) : null;
 
   const LiveScreenComponent = isStarted ? (
     <LiveScreen
@@ -62,7 +43,13 @@ export function App() {
           setClientRole={setClientRole}
         />
       </div>
-      <div>{UserListComponent}</div>
+      <div>
+        <UserList
+          alreadyJoined={alreadyJoined}
+          myUid={client.uid as string | undefined}
+          remoteUsers={remoteUsers}
+        />
+      </div>
       <div>{LiveScreenComponent}</div>
     </div>
   );
