@@ -50,12 +50,6 @@ export function InitialSettingForm(props: InitialSettingForm) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const closeLive = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setIsStarted(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <form>
       <div>
@@ -99,11 +93,9 @@ export function InitialSettingForm(props: InitialSettingForm) {
           Audience
         </label>
       </div>
-      {isStarted ? (
-        <button onClick={closeLive}>Close</button>
-      ) : (
-        <button onClick={startLive}>Open</button>
-      )}
+      <button onClick={startLive} disabled={isStarted}>
+        Open
+      </button>
     </form>
   );
 }
