@@ -3,7 +3,7 @@ import { ClientRole } from "agora-rtc-sdk-ng";
 
 export interface InitialSettingForm {
   isStarted: boolean;
-  setIsStarted: (isStarted: boolean) => void;
+  startLiveCallback: () => void;
   appId: string;
   setAppId: (appId: string) => void;
   channelName: string;
@@ -15,7 +15,7 @@ export interface InitialSettingForm {
 export function InitialSettingForm(props: InitialSettingForm) {
   const {
     isStarted,
-    setIsStarted,
+    startLiveCallback,
     appId,
     setAppId,
     channelName,
@@ -46,7 +46,7 @@ export function InitialSettingForm(props: InitialSettingForm) {
 
   const startLive = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setIsStarted(true);
+    startLiveCallback();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

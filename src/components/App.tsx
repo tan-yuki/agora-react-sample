@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { createAgoraClient } from "../services/createClient";
 import { LiveScreen } from "./LiveScreen";
 import { ClientRole } from "agora-rtc-sdk-ng";
@@ -15,6 +15,10 @@ export function App() {
   const [clientRole, setClientRole] = useState<ClientRole>("host");
   const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
   const [alreadyJoined, setJoinState] = useState(false);
+
+  const startLiveCallback = useCallback(() => {
+    setIsStarted(true);
+  }, []);
 
   const LiveScreenComponent = isStarted ? (
     <LiveScreen
@@ -34,7 +38,7 @@ export function App() {
       <div>
         <InitialSettingForm
           isStarted={isStarted}
-          setIsStarted={setIsStarted}
+          startLiveCallback={startLiveCallback}
           appId={appId}
           setAppId={setAppId}
           channelName={channelName}
