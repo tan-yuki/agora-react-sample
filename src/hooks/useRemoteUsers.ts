@@ -5,13 +5,12 @@ function mergeUser(
   users: IAgoraRTCRemoteUser[],
   user: IAgoraRTCRemoteUser
 ): IAgoraRTCRemoteUser[] {
-  return users.map((u) => {
-    if (u.uid === user.uid) {
-      return user;
-    }
+  // Create map for key: uid, value: user to omit same uid user.
+  const map = [...users, user].reduce((acc, current) => {
+    return { ...acc, [current.uid]: current };
+  }, {});
 
-    return u;
-  });
+  return Object.values(map);
 }
 
 function removeUser(
@@ -59,3 +58,5 @@ export function useRemoteUsers(
 
   return [remoteUsers, setRemoteUsers];
 }
+
+export const UNCAPSULE_FOR_TEST = { mergeUser, removeUser };
