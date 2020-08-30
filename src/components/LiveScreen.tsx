@@ -12,11 +12,12 @@ import { MyMediaPlayer } from "./MediaPlayer/MyMediaPlayer";
 import { RemoteMediaPlayer } from "./MediaPlayer/RemoteMediaPlayer";
 interface LiveScreenProps {
   client: IAgoraRTCClient;
-  channelName: string;
-  appId: string;
-  clientRole: ClientRole;
+  appId: string | undefined;
+  channelName: string | undefined;
+  clientRole: ClientRole | undefined;
   remoteUsers: IAgoraRTCRemoteUser[];
   alreadyJoined: boolean;
+  screenShareUid: string | undefined;
   setJoinState: (state: boolean) => void;
   setRemoteUsers: (users: IAgoraRTCRemoteUser[]) => void;
 }
@@ -39,6 +40,9 @@ export function LiveScreen(props: LiveScreenProps) {
       audioTrack: ILocalAudioTrack,
       videoTrack: ILocalVideoTrack
     ) {
+      if (!appId || !clientRole || !channelName) {
+        return;
+      }
       client.setClientRole(clientRole);
 
       await client.join(
@@ -97,7 +101,7 @@ export function LiveScreen(props: LiveScreenProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!localAudioTrack || !localVideoTrack) {
+  if (!localAudioTrack || !localVideoTrack || !clientRole) {
     return <p>Loading...</p>;
   }
 

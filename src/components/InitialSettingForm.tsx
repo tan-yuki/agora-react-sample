@@ -1,14 +1,11 @@
-import React, { useCallback, ChangeEvent, MouseEvent } from "react";
+import React, { useCallback, ChangeEvent, MouseEvent, useState } from "react";
 import { ClientRole } from "agora-rtc-sdk-ng";
 
 export interface InitialSettingForm {
   isStarted: boolean;
   startLiveCallback: () => void;
-  appId: string;
   setAppId: (appId: string) => void;
-  channelName: string;
   setChannelName: (channelName: string) => void;
-  clientRole: ClientRole;
   setClientRole: (clientRole: ClientRole) => void;
 }
 
@@ -16,39 +13,51 @@ export function InitialSettingForm(props: InitialSettingForm) {
   const {
     isStarted,
     startLiveCallback,
-    appId,
     setAppId,
-    channelName,
     setChannelName,
-    clientRole,
     setClientRole,
   } = props;
 
+  const [draftAppId, setDraftAppId] = useState("");
+  const [draftChannelName, setDraftChannelName] = useState("");
+  const [draftRole, setDraftRole] = useState<ClientRole>("host");
+
   const onChangeAppId = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setAppId(e.target.value);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setDraftAppId(e.target.value);
   }, []);
 
   const onChangeChannelName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      setChannelName(e.target.value);
+      setDraftChannelName(e.target.value);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
   const onChangeRole = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setClientRole(e.target.value === "host" ? "host" : "audience");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setDraftRole(e.target.value === "host" ? "host" : "audience");
   }, []);
 
-  const startLive = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    startLiveCallback();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const startLive = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+
+      setAppId(draftAppId);
+      setChannelName(draftChannelName);
+      setClientRole(draftRole);
+
+      startLiveCallback();
+    },
+    [
+      draftAppId,
+      draftChannelName,
+      draftRole,
+      setAppId,
+      setChannelName,
+      setClientRole,
+      startLiveCallback,
+    ]
+  );
 
   return (
     <form>
@@ -56,14 +65,14 @@ export function InitialSettingForm(props: InitialSettingForm) {
         <label>App Id: </label>
         <input
           type="text"
-          value={appId}
+          value={draftAppId}
           onChange={onChangeAppId}
           disabled={isStarted}
         />
         <label>Channel Name: </label>
         <input
           type="text"
-          value={channelName}
+          value={draftChannelName}
           onChange={onChangeChannelName}
           disabled={isStarted}
         />
@@ -75,7 +84,7 @@ export function InitialSettingForm(props: InitialSettingForm) {
             type="radio"
             name="role"
             value="host"
-            checked={clientRole === "host"}
+            checked={draftRole === "host"}
             onChange={onChangeRole}
             disabled={isStarted}
           />
@@ -86,7 +95,7 @@ export function InitialSettingForm(props: InitialSettingForm) {
             type="radio"
             name="role"
             value="audience"
-            checked={clientRole === "audience"}
+            checked={draftRole === "audience"}
             onChange={onChangeRole}
             disabled={isStarted}
           />
