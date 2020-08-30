@@ -1,39 +1,32 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { createAgoraClient } from "../services/createClient";
-import { ClientRole } from "agora-rtc-sdk-ng";
 import { InitialSettingForm } from "./InitialSettingForm";
 import { MainContent } from "./MainContent";
+import { InitialSettingValue } from "../model/InitialSettingValue";
 
 const client = createAgoraClient();
 
 export function App() {
-  const [isStarted, setIsStarted] = useState<boolean>(false);
-  const [appId, setAppId] = useState<string | undefined>();
-  const [channelName, setChannelName] = useState<string | undefined>();
-  const [clientRole, setClientRole] = useState<ClientRole | undefined>();
+  const [initialSettingValue, setInitialSettingValue] = useState<
+    InitialSettingValue | undefined
+  >();
   const [alreadyJoined, setJoinState] = useState(false);
-  const startLiveCallback = useCallback(() => {
-    setIsStarted(true);
-  }, []);
 
   return (
     <div>
       <div>
         <InitialSettingForm
-          isStarted={isStarted}
-          startLiveCallback={startLiveCallback}
-          setAppId={setAppId}
-          setChannelName={setChannelName}
-          setClientRole={setClientRole}
+          isStarted={!!initialSettingValue}
+          setInitialSettingValue={setInitialSettingValue}
         />
       </div>
       <div>
-        {isStarted ? (
+        {initialSettingValue ? (
           <MainContent
-            appId={appId}
-            channelName={channelName}
+            appId={initialSettingValue.appId}
+            channelName={initialSettingValue.channelName}
             client={client}
-            clientRole={clientRole}
+            clientRole={initialSettingValue.clientRole}
             alreadyJoined={alreadyJoined}
             setJoinState={setJoinState}
           />

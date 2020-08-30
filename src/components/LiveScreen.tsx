@@ -10,10 +10,13 @@ import {
 } from "agora-rtc-sdk-ng";
 import { MyMediaPlayer } from "./MediaPlayer/MyMediaPlayer";
 import { RemoteMediaPlayer } from "./MediaPlayer/RemoteMediaPlayer";
+import { AppId } from "../model/AppId";
+import { ChannelName } from "../model/ChannelName";
+
 interface LiveScreenProps {
   client: IAgoraRTCClient;
-  appId: string | undefined;
-  channelName: string | undefined;
+  appId: AppId | undefined;
+  channelName: ChannelName | undefined;
   clientRole: ClientRole | undefined;
   remoteUsers: IAgoraRTCRemoteUser[];
   alreadyJoined: boolean;

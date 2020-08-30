@@ -1,22 +1,16 @@
 import React, { useCallback, ChangeEvent, MouseEvent, useState } from "react";
 import { ClientRole } from "agora-rtc-sdk-ng";
+import { InitialSettingValue } from "../model/InitialSettingValue";
+import { ChannelName } from "../model/ChannelName";
+import { AppId } from "../model/AppId";
 
 export interface InitialSettingForm {
   isStarted: boolean;
-  startLiveCallback: () => void;
-  setAppId: (appId: string) => void;
-  setChannelName: (channelName: string) => void;
-  setClientRole: (clientRole: ClientRole) => void;
+  setInitialSettingValue: (v: InitialSettingValue) => void;
 }
 
 export function InitialSettingForm(props: InitialSettingForm) {
-  const {
-    isStarted,
-    startLiveCallback,
-    setAppId,
-    setChannelName,
-    setClientRole,
-  } = props;
+  const { isStarted, setInitialSettingValue } = props;
 
   const [draftAppId, setDraftAppId] = useState("");
   const [draftChannelName, setDraftChannelName] = useState("");
@@ -42,21 +36,13 @@ export function InitialSettingForm(props: InitialSettingForm) {
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
 
-      setAppId(draftAppId);
-      setChannelName(draftChannelName);
-      setClientRole(draftRole);
-
-      startLiveCallback();
+      setInitialSettingValue({
+        appId: draftAppId as AppId,
+        channelName: draftChannelName as ChannelName,
+        clientRole: draftRole,
+      });
     },
-    [
-      draftAppId,
-      draftChannelName,
-      draftRole,
-      setAppId,
-      setChannelName,
-      setClientRole,
-      startLiveCallback,
-    ]
+    [draftAppId, draftChannelName, draftRole, setInitialSettingValue]
   );
 
   return (

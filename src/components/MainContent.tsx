@@ -8,10 +8,12 @@ import {
   ILocalVideoTrack,
 } from "agora-rtc-sdk-ng";
 import { useRemoteUsers } from "../hooks/useRemoteUsers";
+import { AppId } from "../model/AppId";
+import { ChannelName } from "../model/ChannelName";
 
 interface MainContentProps {
-  appId: string | undefined;
-  channelName: string | undefined;
+  appId: AppId | undefined;
+  channelName: ChannelName | undefined;
   client: IAgoraRTCClient;
   clientRole: ClientRole | undefined;
   alreadyJoined: boolean;

@@ -1,10 +1,12 @@
 import React, { useCallback } from "react";
 import AgoraRTC, { ILocalVideoTrack } from "agora-rtc-sdk-ng";
 import { createAgoraClient } from "../services/createClient";
+import { ChannelName } from "../model/ChannelName";
+import { AppId } from "../model/AppId";
 
 interface ControlPanelProps {
-  appId: string | undefined;
-  channelName: string | undefined;
+  appId: AppId | undefined;
+  channelName: ChannelName | undefined;
   isStartedScreenSharing: boolean;
   setScreenShareVideoTrack: (videoTrack: ILocalVideoTrack) => void;
   setScreenShareUid: (uid: string) => void;
