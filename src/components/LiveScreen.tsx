@@ -24,7 +24,7 @@ export function LiveScreen(props: LiveScreenProps) {
     .map((user: IAgoraRTCRemoteUser) => {
       return (
         <RemoteMediaPlayer
-          key={`remote-${user.uid}`}
+          key={`remote-${user.uid.toString()}`}
           audioTrack={user.audioTrack}
           videoTrack={user.videoTrack}
         />

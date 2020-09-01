@@ -96,7 +96,7 @@ export function MainContent(props: MainContentProps) {
 
   return (
     <div>
-      <UserList myUid={client.uid?.toString()} remoteUsers={remoteUsers} />
+      <UserList myUid={client.uid} remoteUsers={remoteUsers} />
       <ControlPanel
         appId={appId}
         channelName={channelName}

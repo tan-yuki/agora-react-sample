@@ -1,8 +1,8 @@
 import React from "react";
-import { IAgoraRTCRemoteUser } from "agora-rtc-sdk-ng";
+import { IAgoraRTCRemoteUser, UID } from "agora-rtc-sdk-ng";
 
 interface UserListProps {
-  myUid: string | undefined;
+  myUid: UID | undefined;
   remoteUsers: IAgoraRTCRemoteUser[];
 }
 
@@ -16,7 +16,7 @@ export function UserList(props: UserListProps) {
   const userIdList = [myUid]
     .concat(
       remoteUsers.map((user: IAgoraRTCRemoteUser) => {
-        return user.uid.toString();
+        return user.uid;
       })
     )
     .filter((_) => _);
@@ -26,7 +26,7 @@ export function UserList(props: UserListProps) {
       <p>User list</p>
       <ul>
         {userIdList.map((uid) => (
-          <li key={uid}>{uid}</li>
+          <li key={uid.toString()}>{uid.toString()}</li>
         ))}
       </ul>
     </div>
