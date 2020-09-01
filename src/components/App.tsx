@@ -10,7 +10,6 @@ export function App() {
   const [initialSettingValue, setInitialSettingValue] = useState<
     InitialSettingValue | undefined
   >();
-  const [alreadyJoined, setJoinState] = useState(false);
 
   return (
     <div>
@@ -23,12 +22,8 @@ export function App() {
       <div>
         {initialSettingValue ? (
           <MainContent
-            appId={initialSettingValue.appId}
-            channelName={initialSettingValue.channelName}
+            initialSettingValue={initialSettingValue}
             client={client}
-            clientRole={initialSettingValue.clientRole}
-            alreadyJoined={alreadyJoined}
-            setJoinState={setJoinState}
           />
         ) : null}
       </div>

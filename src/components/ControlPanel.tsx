@@ -5,11 +5,10 @@ import { ChannelName } from "../model/ChannelName";
 import { AppId } from "../model/AppId";
 
 interface ControlPanelProps {
-  appId: AppId | undefined;
-  channelName: ChannelName | undefined;
+  appId: AppId;
+  channelName: ChannelName;
   isStartedScreenSharing: boolean;
   setScreenShareVideoTrack: (videoTrack: ILocalVideoTrack) => void;
-  setScreenShareUid: (uid: string) => void;
 }
 
 export function ControlPanel(props: ControlPanelProps) {
@@ -18,15 +17,10 @@ export function ControlPanel(props: ControlPanelProps) {
     channelName,
     isStartedScreenSharing,
     setScreenShareVideoTrack,
-    setScreenShareUid,
   } = props;
 
   const startScreenSharing = useCallback(() => {
     async function publishScreenShare() {
-      if (!appId || !channelName) {
-        return;
-      }
-
       // 画面共有用のAgoraClient.
       // AgoraClientは2つのVideo Streamを同時に2つ以上publishできないため、
       // 画面共有をするときはそれ専用のAgoraClientを生成する。
@@ -34,7 +28,7 @@ export function ControlPanel(props: ControlPanelProps) {
       client.setClientRole("host");
 
       // join this client
-      const screenShareUid = await client.join(appId, channelName, null);
+      await client.join(appId, channelName, null);
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         {
           // This option is valid only Firefox.
@@ -44,12 +38,11 @@ export function ControlPanel(props: ControlPanelProps) {
         "disable"
       );
       client.publish(screenTrack);
-      setScreenShareUid(screenShareUid.toString());
       setScreenShareVideoTrack(screenTrack);
     }
 
     publishScreenShare();
-  }, [appId, channelName, setScreenShareVideoTrack, setScreenShareUid]);
+  }, [appId, channelName, setScreenShareVideoTrack]);
 
   return (
     <div>

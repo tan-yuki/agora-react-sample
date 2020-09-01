@@ -2,15 +2,14 @@ import React from "react";
 import { IAgoraRTCRemoteUser } from "agora-rtc-sdk-ng";
 
 interface UserListProps {
-  alreadyJoined: boolean;
   myUid: string | undefined;
   remoteUsers: IAgoraRTCRemoteUser[];
 }
 
 export function UserList(props: UserListProps) {
-  const { alreadyJoined, myUid, remoteUsers } = props;
+  const { myUid, remoteUsers } = props;
 
-  if (!alreadyJoined || !myUid) {
+  if (!myUid) {
     return null;
   }
 
