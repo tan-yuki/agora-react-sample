@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
-import AgoraRTC, { ILocalVideoTrack } from "agora-rtc-sdk-ng";
-import { createAgoraClient } from "../services/createClient";
+import { ILocalVideoTrack } from "agora-rtc-sdk-ng";
 import { ChannelName } from "../model/ChannelName";
 import { AppId } from "../model/AppId";
+import { createScreenShareClient } from "../services/createScreenShareClient";
 
 interface ControlPanelProps {
   appId: AppId;
@@ -28,23 +28,7 @@ export function ControlPanel(props: ControlPanelProps) {
   const startScreenSharing = useCallback(() => {
     async function publishScreenShare() {
       setScreenShareLoadingState("loading");
-
-      // 画面共有用のAgoraClient.
-      // AgoraClientは2つのVideo Streamを同時に2つ以上publishできないため、
-      // 画面共有をするときはそれ専用のAgoraClientを生成する。
-      const client = createAgoraClient();
-      client.setClientRole("host");
-
-      await client.join(appId, channelName, null);
-      const screenTrack = await AgoraRTC.createScreenVideoTrack(
-        {
-          // This option is valid only Firefox.
-          // see: https://agoraio-community.github.io/AgoraWebSDK-NG/api/en/interfaces/screenvideotrackinitconfig.html#screensourcetype
-          screenSourceType: "window",
-        },
-        "disable"
-      );
-      await client.publish(screenTrack);
+      const [, screenTrack] = await createScreenShareClient(appId, channelName);
       setScreenShareVideoTrack(screenTrack);
       setScreenShareLoadingState("none");
     }
