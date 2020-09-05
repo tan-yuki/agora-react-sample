@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createAgoraClient } from "../services/createClient";
+import { createAgoraClient } from "../services/createAgoraClient";
 import { InitialSettingForm } from "./InitialSettingForm";
 import { MainContent } from "./MainContent";
 import { InitialSettingValue } from "../model/InitialSettingValue";
