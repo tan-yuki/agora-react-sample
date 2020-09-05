@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import AgoraRTC, { ILocalVideoTrack } from "agora-rtc-sdk-ng";
 import { createAgoraClient } from "../services/createClient";
 import { ChannelName } from "../model/ChannelName";
@@ -11,6 +11,8 @@ interface ControlPanelProps {
   setScreenShareVideoTrack: (videoTrack: ILocalVideoTrack) => void;
 }
 
+type ScreenShareLoadingState = "none" | "loading";
+
 export function ControlPanel(props: ControlPanelProps) {
   const {
     appId,
@@ -19,15 +21,20 @@ export function ControlPanel(props: ControlPanelProps) {
     setScreenShareVideoTrack,
   } = props;
 
+  const [screenShareLoadingState, setScreenShareLoadingState] = useState<
+    ScreenShareLoadingState
+  >("none");
+
   const startScreenSharing = useCallback(() => {
     async function publishScreenShare() {
+      setScreenShareLoadingState("loading");
+
       // 画面共有用のAgoraClient.
       // AgoraClientは2つのVideo Streamを同時に2つ以上publishできないため、
       // 画面共有をするときはそれ専用のAgoraClientを生成する。
       const client = createAgoraClient();
       client.setClientRole("host");
 
-      // join this client
       await client.join(appId, channelName, null);
       const screenTrack = await AgoraRTC.createScreenVideoTrack(
         {
@@ -37,8 +44,9 @@ export function ControlPanel(props: ControlPanelProps) {
         },
         "disable"
       );
-      client.publish(screenTrack);
+      await client.publish(screenTrack);
       setScreenShareVideoTrack(screenTrack);
+      setScreenShareLoadingState("none");
     }
 
     publishScreenShare();
@@ -55,7 +63,9 @@ export function ControlPanel(props: ControlPanelProps) {
           >
             Screen Share
           </button>
-          {isStartedScreenSharing ? <span>Now Sharing...</span> : null}
+          {screenShareLoadingState === "loading" ? (
+            <span>Now Sharing...</span>
+          ) : null}
         </li>
       </ul>
     </div>
