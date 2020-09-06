@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from "react";
-import { ILocalVideoTrack } from "agora-rtc-sdk-ng";
 import { ChannelName } from "../model/ChannelName";
 import { AppId } from "../model/AppId";
 import { createScreenShareClient } from "../services/createScreenShareClient";
@@ -7,34 +6,26 @@ import { createScreenShareClient } from "../services/createScreenShareClient";
 interface ControlPanelProps {
   appId: AppId;
   channelName: ChannelName;
-  isStartedScreenSharing: boolean;
-  setScreenShareVideoTrack: (videoTrack: ILocalVideoTrack) => void;
 }
 
-type ScreenShareLoadingState = "none" | "loading";
+type ScreenShareState = "none" | "loading" | "sharing";
 
 export function ControlPanel(props: ControlPanelProps) {
-  const {
-    appId,
-    channelName,
-    isStartedScreenSharing,
-    setScreenShareVideoTrack,
-  } = props;
+  const { appId, channelName } = props;
 
-  const [screenShareLoadingState, setScreenShareLoadingState] = useState<
-    ScreenShareLoadingState
-  >("none");
+  const [screenShareState, setScreenShareState] = useState<ScreenShareState>(
+    "none"
+  );
 
   const startScreenSharing = useCallback(() => {
     async function publishScreenShare() {
-      setScreenShareLoadingState("loading");
-      const [, screenTrack] = await createScreenShareClient(appId, channelName);
-      setScreenShareVideoTrack(screenTrack);
-      setScreenShareLoadingState("none");
+      setScreenShareState("loading");
+      await createScreenShareClient(appId, channelName);
+      setScreenShareState("sharing");
     }
 
     publishScreenShare();
-  }, [appId, channelName, setScreenShareVideoTrack]);
+  }, [appId, channelName]);
 
   return (
     <div>
@@ -43,13 +34,11 @@ export function ControlPanel(props: ControlPanelProps) {
         <li>
           <button
             onClick={startScreenSharing}
-            disabled={isStartedScreenSharing}
+            disabled={screenShareState !== "none"}
           >
             Screen Share
           </button>
-          {screenShareLoadingState === "loading" ? (
-            <span>Now Sharing...</span>
-          ) : null}
+          {screenShareState === "loading" ? <span>Now Sharing...</span> : null}
         </li>
       </ul>
     </div>

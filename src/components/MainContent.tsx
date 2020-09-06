@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { UserList } from "./UserList";
 import { ControlPanel } from "./ControlPanel";
 import { LiveScreen } from "./LiveScreen";
-import { IAgoraRTCClient, ILocalVideoTrack } from "agora-rtc-sdk-ng";
+import { IAgoraRTCClient } from "agora-rtc-sdk-ng";
 import { InitialSettingValue } from "../model/InitialSettingValue";
 import { useAgoraClient } from "../hooks/useAgoraClient";
 
@@ -15,9 +15,6 @@ export function MainContent(props: MainContentProps) {
   const { initialSettingValue, client } = props;
   const { appId, channelName, clientRole } = initialSettingValue;
 
-  const [screenShareVideoTrack, setScreenShareVideoTrack] = useState<
-    ILocalVideoTrack | undefined
-  >(undefined);
   const [alreadyJoined, remoteUsers] = useAgoraClient(
     client,
     appId,
@@ -31,12 +28,7 @@ export function MainContent(props: MainContentProps) {
   return (
     <div>
       <UserList myUid={client.uid} remoteUsers={remoteUsers} />
-      <ControlPanel
-        appId={appId}
-        channelName={channelName}
-        isStartedScreenSharing={!!screenShareVideoTrack}
-        setScreenShareVideoTrack={setScreenShareVideoTrack}
-      />
+      <ControlPanel appId={appId} channelName={channelName} />
       <LiveScreen clientRole={clientRole} remoteUsers={remoteUsers} />
     </div>
   );
