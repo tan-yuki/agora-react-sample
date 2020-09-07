@@ -11,6 +11,7 @@ import { ChannelName } from "../model/ChannelName";
 import { AppId } from "../model/AppId";
 import { useRemoteUsers } from "./useRemoteUsers";
 import { useMicrophoneAndCameraTracks } from "./useMicrophoneAndCameraTracks";
+import { cleanupAgoraClient } from "../services/cleanupAgoraClient";
 
 export function useAgoraClient(
   client: IAgoraRTCClient,
@@ -71,15 +72,7 @@ export function useAgoraClient(
       const tracks: ILocalTrack[] = [];
       localAudioTrack && tracks.push(localAudioTrack);
       localVideoTrack && tracks.push(localVideoTrack);
-
-      client
-        .unpublish(tracks)
-        // clientRoleがaudienceのときはストリームをpublishしていないため
-        // audienceのユーザーがunpublishをするとエラーになる。
-        // そのため、unpublishでエラーがでてもかならずleaveが実行されるように
-        // finallyとしている。
-        .finally(() => client.leave())
-        .finally(() => setJoinState(false));
+      cleanupAgoraClient(client, tracks).finally(() => setJoinState(false));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

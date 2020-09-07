@@ -19,7 +19,10 @@ export function UserList(props: UserListProps) {
         return user.uid;
       })
     )
+    // 空ユーザーは除外
     .filter((_) => _);
+  // 本来画面共有のUIDは表示しないが、デバッグ用に表示する
+  // .filter((uid) => !isScreenShareUID(uid));
 
   return (
     <div>

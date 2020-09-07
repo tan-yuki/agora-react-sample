@@ -14,13 +14,13 @@ interface MainContentProps {
 export function MainContent(props: MainContentProps) {
   const { initialSettingValue, client } = props;
   const { appId, channelName, clientRole } = initialSettingValue;
-
   const [alreadyJoined, remoteUsers] = useAgoraClient(
     client,
     appId,
     channelName,
     clientRole
   );
+
   if (!alreadyJoined) {
     return <p>Loading...</p>;
   }

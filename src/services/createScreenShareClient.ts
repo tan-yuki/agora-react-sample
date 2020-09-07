@@ -19,7 +19,10 @@ export async function createScreenShareClient(
   const client = createAgoraClient();
   client.setClientRole("host");
 
-  await client.join(appId, channelName, null, createRawScreenShareUID());
+  // この時点で、ブラウザ側の画面共有する画面を選択するモーダルが表示される。
+  // ここでキャンセルをすると例外が発生する。
+  // この処理の前にclinet.joinの処理をしてしまうとユーザーだけ生成されてしまうため、
+  // 必ずcreateScreenVideoTrackのあとにjoinすること。
   const screenTrack = await AgoraRTC.createScreenVideoTrack(
     {
       // This option is valid only Firefox.
@@ -28,6 +31,8 @@ export async function createScreenShareClient(
     },
     "disable"
   );
+
+  await client.join(appId, channelName, null, createRawScreenShareUID());
   await client.publish(screenTrack);
 
   return [client, screenTrack];
