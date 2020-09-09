@@ -20,7 +20,10 @@ export function MyMediaPlayer(props: MyMediaPlayerProps) {
       clientRole={clientRole}
       audioTrack={audioTrack}
       videoTrack={videoTrack}
-      trackType="local"
+      // 自分の音声ストリームは流さない。
+      // 自分の音声ストリームを流してしまうと、自分の声が跳ね返って聞こえてしまい、
+      // 非常に使い勝手が悪くなってしまうため。
+      offAudio={true}
     />
   );
 }

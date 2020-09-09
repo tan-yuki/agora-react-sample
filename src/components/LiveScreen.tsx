@@ -3,6 +3,8 @@ import { useMicrophoneAndCameraTracks } from "../hooks/useMicrophoneAndCameraTra
 import { IAgoraRTCRemoteUser, ClientRole } from "agora-rtc-sdk-ng";
 import { MyMediaPlayer } from "./MediaPlayer/MyMediaPlayer";
 import { RemoteMediaPlayer } from "./MediaPlayer/RemoteMediaPlayer";
+import { isScreenShareUID } from "../model/ScreenShareUID";
+import { ScreenSharePlayer } from "./MediaPlayer/ScreenSharePlayer";
 
 interface LiveScreenProps {
   clientRole: ClientRole;
@@ -17,7 +19,17 @@ export function LiveScreen(props: LiveScreenProps) {
     return null;
   }
 
-  const remoteMediaPlayers = remoteUsers
+  const [screenShareUser, remoteUsersExceptScreenShare] = remoteUsers.reduce(
+    (acc, user) => {
+      if (isScreenShareUID(user.uid)) {
+        return [user, acc[1]];
+      }
+      return [acc[0], [...acc[1], user]];
+    },
+    [undefined as IAgoraRTCRemoteUser | undefined, [] as IAgoraRTCRemoteUser[]]
+  );
+
+  const remoteMediaPlayers = remoteUsersExceptScreenShare
     .filter((user: IAgoraRTCRemoteUser) => {
       return user.audioTrack || user.videoTrack;
     })
@@ -33,6 +45,9 @@ export function LiveScreen(props: LiveScreenProps) {
 
   return (
     <div>
+      {screenShareUser?.videoTrack ? (
+        <ScreenSharePlayer videoTrack={screenShareUser.videoTrack} />
+      ) : null}
       <MyMediaPlayer
         clientRole={clientRole}
         audioTrack={localAudioTrack}

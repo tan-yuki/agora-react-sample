@@ -1,5 +1,6 @@
 import React from "react";
 import { IAgoraRTCRemoteUser, UID } from "agora-rtc-sdk-ng";
+import { isScreenShareUID } from "../model/ScreenShareUID";
 
 interface UserListProps {
   myUid: UID | undefined;
@@ -20,9 +21,9 @@ export function UserList(props: UserListProps) {
       })
     )
     // 空ユーザーは除外
-    .filter((_) => _);
-  // 本来画面共有のUIDは表示しないが、デバッグ用に表示する
-  // .filter((uid) => !isScreenShareUID(uid));
+    .filter((_) => _)
+    // 画面共有のユーザーは除外
+    .filter((uid) => !isScreenShareUID(uid));
 
   return (
     <div>
