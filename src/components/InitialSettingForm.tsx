@@ -2,7 +2,6 @@ import React, { useCallback, ChangeEvent, MouseEvent, useState } from "react";
 import { ClientRole } from "agora-rtc-sdk-ng";
 import { InitialSettingValue } from "../model/InitialSettingValue";
 import { ChannelName } from "../model/ChannelName";
-import { AppId } from "../model/AppId";
 
 export interface InitialSettingForm {
   isStarted: boolean;
@@ -12,14 +11,8 @@ export interface InitialSettingForm {
 export function InitialSettingForm(props: InitialSettingForm) {
   const { isStarted, setInitialSettingValue } = props;
 
-  const [draftAppId, setDraftAppId] = useState("");
   const [draftChannelName, setDraftChannelName] = useState("");
   const [draftRole, setDraftRole] = useState<ClientRole>("host");
-
-  const onChangeAppId = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setDraftAppId(e.target.value);
-  }, []);
 
   const onChangeChannelName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,24 +30,16 @@ export function InitialSettingForm(props: InitialSettingForm) {
       e.preventDefault();
 
       setInitialSettingValue({
-        appId: draftAppId as AppId,
         channelName: draftChannelName as ChannelName,
         clientRole: draftRole,
       });
     },
-    [draftAppId, draftChannelName, draftRole, setInitialSettingValue]
+    [draftChannelName, draftRole, setInitialSettingValue]
   );
 
   return (
     <form>
       <div>
-        <label>App Id: </label>
-        <input
-          type="text"
-          value={draftAppId}
-          onChange={onChangeAppId}
-          disabled={isStarted}
-        />
         <label>Channel Name: </label>
         <input
           type="text"
