@@ -12,6 +12,8 @@ import { AppId } from "../model/AppId";
 import { useRemoteUsers } from "./useRemoteUsers";
 import { useMicrophoneAndCameraTracks } from "./useMicrophoneAndCameraTracks";
 import { cleanupAgoraClient } from "../services/cleanupAgoraClient";
+import { getTokenApi } from "../services/api/getTokenApi";
+import { createDummyUID } from "../services/createDummyUID";
 
 export function useAgoraClient(
   client: IAgoraRTCClient,
@@ -30,12 +32,9 @@ export function useAgoraClient(
     ) {
       client.setClientRole(clientRole);
 
-      await client.join(
-        appId,
-        channelName,
-        // TODO: tokenを指定
-        null
-      );
+      const uid = createDummyUID();
+      const token = await getTokenApi(appId, channelName, uid);
+      await client.join(appId, channelName, token, uid);
 
       // 音声や映像ストリームをpublishするのは
       // hostのみなので、clientRoleがhostのときのみpublishする

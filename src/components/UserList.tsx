@@ -9,7 +9,6 @@ interface UserListProps {
 
 export function UserList(props: UserListProps) {
   const { myUid, remoteUsers } = props;
-
   if (!myUid) {
     return null;
   }
