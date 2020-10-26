@@ -4,7 +4,7 @@
 
 # Setup
 
-1. copy `.env.sample` to `.env`, and edit it.
+1. copy `.env.example` to `.env`, and edit it.
 2. Run server: `yarn start`.
 
 
