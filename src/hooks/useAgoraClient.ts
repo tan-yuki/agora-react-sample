@@ -33,7 +33,7 @@ export function useAgoraClient(
       client.setClientRole(clientRole);
 
       const uid = createDummyUID();
-      const token = await getTokenApi(appId, channelName, uid);
+      const token = await getTokenApi(channelName, uid);
       await client.join(appId, channelName, token, uid);
 
       // 音声や映像ストリームをpublishするのは

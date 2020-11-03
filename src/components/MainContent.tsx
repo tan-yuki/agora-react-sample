@@ -1,6 +1,6 @@
 import React from "react";
 import { UserList } from "./UserList";
-import { ControlPanel } from "./ControlPanel";
+import { ControlPanel } from "./ControlPanel/ControlPanel";
 import { LiveScreen } from "./LiveScreen";
 import { IAgoraRTCClient } from "agora-rtc-sdk-ng";
 import { InitialSettingValue } from "../model/InitialSettingValue";
@@ -28,10 +28,14 @@ export function MainContent(props: MainContentProps) {
   }
 
   return (
-    <div>
+    <>
       <UserList myUid={client.uid} remoteUsers={remoteUsers} />
-      <ControlPanel appId={appId} channelName={channelName} />
+      <ControlPanel
+        appId={appId}
+        myUid={client.uid}
+        channelName={channelName}
+      />
       <LiveScreen clientRole={clientRole} remoteUsers={remoteUsers} />
-    </div>
+    </>
   );
 }
