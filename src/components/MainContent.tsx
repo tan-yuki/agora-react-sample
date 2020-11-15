@@ -5,16 +5,15 @@ import { LiveScreen } from "./LiveScreen";
 import { IAgoraRTCClient } from "agora-rtc-sdk-ng";
 import { InitialSettingValue } from "../model/InitialSettingValue";
 import { useAgoraClient } from "../hooks/useAgoraClient";
-import { AppId } from "../model/AppId";
+import { appId } from "../model/AppId";
 
 interface MainContentProps {
   initialSettingValue: InitialSettingValue;
   client: IAgoraRTCClient;
-  appId: AppId;
 }
 
 export function MainContent(props: MainContentProps) {
-  const { initialSettingValue, client, appId } = props;
+  const { initialSettingValue, client } = props;
   const { channelName, clientRole } = initialSettingValue;
   const [alreadyJoined, remoteUsers] = useAgoraClient(
     client,
