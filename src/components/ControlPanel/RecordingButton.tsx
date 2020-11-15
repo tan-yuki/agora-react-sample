@@ -1,65 +1,60 @@
 import React, { useCallback, useState } from "react";
 import { ChannelName } from "../../model/ChannelName";
-import { postStartRecordingApi } from "../../services/api/postStartRecordingApi";
-import {
-  initializeRecording,
-  loadingRecording,
-  Recording,
-  RecordingAfterStarting,
-  startRecording,
-  stopRecording,
-} from "../../model/Recording";
+import { RecordingState } from "../../model/RecordingState";
 import { UID } from "agora-rtc-sdk-ng";
+import {
+  postStartRecordingApi,
+  PostStartRecordingResponse,
+} from "../../services/api/postStartRecordingApi";
 import { postStopRecordingApi } from "../../services/api/postStopRecordingApi";
+import { Token } from "../../model/Token";
 
 interface RecordingButtonProps {
   userId: UID | undefined;
   channelName: ChannelName;
+  token: Token | undefined;
 }
 
 export function RecordingButton(props: RecordingButtonProps) {
-  const { channelName, userId } = props;
-  const [recording, setRecording] = useState<
-    Recording | RecordingAfterStarting
-  >(initializeRecording());
+  const { channelName, userId, token } = props;
+  const [recordingState, setRecordingState] = useState<RecordingState>("none");
+  const [startApiResponse, setStartApiResponse] = useState<
+    PostStartRecordingResponse | undefined
+  >();
 
   const onClickStart = useCallback(() => {
-    if (!userId) {
+    if (!userId || !channelName || !token || recordingState !== "none") {
       return;
     }
 
-    setRecording(loadingRecording(recording));
-    postStartRecordingApi(channelName, userId).then((response) => {
-      setRecording(
-        startRecording(recording, response.recordingId, response.resourceId)
-      );
+    setRecordingState("loading");
+    postStartRecordingApi(channelName, userId, token).then((response) => {
+      setRecordingState("recording");
+      setStartApiResponse(response);
     });
-  }, [channelName, userId, recording]);
+  }, [channelName, userId, token, recordingState]);
 
   const onClickStop = useCallback(() => {
-    if (!userId) {
-      return;
-    }
-
-    const recordingAfterStarting = recording as RecordingAfterStarting;
     if (
-      !recordingAfterStarting.recordingId ||
-      !recordingAfterStarting.resourceId
+      !userId ||
+      !token ||
+      !startApiResponse ||
+      recordingState !== "recording"
     ) {
       return;
     }
 
     postStopRecordingApi(
-      recordingAfterStarting.resourceId,
-      recordingAfterStarting.recordingId,
+      startApiResponse.resourceId,
+      startApiResponse.recordingId,
       channelName,
       userId
     ).then(() => {
-      setRecording(stopRecording(recordingAfterStarting));
+      setRecordingState("none");
     });
-  }, [channelName, userId, recording]);
+  }, [channelName, userId, token, startApiResponse, recordingState]);
 
-  switch (recording.state) {
+  switch (recordingState) {
     case "none":
       return <button onClick={onClickStart}>Start Recording</button>;
 
@@ -71,7 +66,7 @@ export function RecordingButton(props: RecordingButtonProps) {
 
     default:
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _exhaustiveCheck: never = recording.state;
+      const _exhaustiveCheck: never = recordingState;
       return null;
   }
 }

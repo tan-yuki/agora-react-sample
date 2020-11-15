@@ -11,11 +11,15 @@ interface PostStopRecordingRequestParams {
   userId: string;
 }
 
-interface FileResponse {
+interface RawPostStopRecordingResponse {
+  files: { fileName: string }[];
+}
+
+export interface FileResponse {
   fileName: string;
 }
 
-interface PostStopRecordingResponse {
+export interface PostStopRecordingResponse {
   files: FileResponse[];
 }
 
@@ -24,10 +28,10 @@ export async function postStopRecordingApi(
   recordingId: RecordingId,
   channelName: ChannelName,
   userId: UID
-): Promise<FileResponse[]> {
+): Promise<PostStopRecordingResponse> {
   const { files } = await callPostApi<
     PostStopRecordingRequestParams,
-    PostStopRecordingResponse
+    RawPostStopRecordingResponse
   >("/recording/stop", {
     resourceId,
     sid: recordingId,
@@ -35,5 +39,5 @@ export async function postStopRecordingApi(
     userId: userId.toString(),
   });
 
-  return files;
+  return { files };
 }

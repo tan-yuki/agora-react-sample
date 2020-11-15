@@ -15,7 +15,7 @@ interface MainContentProps {
 export function MainContent(props: MainContentProps) {
   const { initialSettingValue, client } = props;
   const { channelName, clientRole } = initialSettingValue;
-  const [alreadyJoined, remoteUsers] = useAgoraClient(
+  const [alreadyJoined, remoteUsers, token] = useAgoraClient(
     client,
     appId,
     channelName,
@@ -33,6 +33,7 @@ export function MainContent(props: MainContentProps) {
         appId={appId}
         myUid={client.uid}
         channelName={channelName}
+        token={token}
       />
       <LiveScreen clientRole={clientRole} remoteUsers={remoteUsers} />
     </>

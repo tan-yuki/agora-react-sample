@@ -14,16 +14,18 @@ import { useMicrophoneAndCameraTracks } from "./useMicrophoneAndCameraTracks";
 import { cleanupAgoraClient } from "../services/cleanupAgoraClient";
 import { getTokenApi } from "../services/api/getTokenApi";
 import { createDummyUID } from "../services/createDummyUID";
+import { Token } from "../model/Token";
 
 export function useAgoraClient(
   client: IAgoraRTCClient,
   appId: AppId,
   channelName: ChannelName,
   clientRole: ClientRole
-): [boolean, IAgoraRTCRemoteUser[]] {
+): [boolean, IAgoraRTCRemoteUser[], Token | undefined] {
   const [localAudioTrack, localVideoTrack] = useMicrophoneAndCameraTracks();
   const [alreadyJoined, setJoinState] = useState(false);
   const [remoteUsers, setRemoteUsers] = useRemoteUsers(client);
+  const [token, setToken] = useState<Token | undefined>();
 
   useEffect(() => {
     async function join(
@@ -46,6 +48,7 @@ export function useAgoraClient(
       // このタイミングで改めてremoteUsersの状態を更新する
       setRemoteUsers(client.remoteUsers);
       setJoinState(true);
+      setToken(token);
     }
 
     if (localAudioTrack && localVideoTrack) {
@@ -76,5 +79,5 @@ export function useAgoraClient(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return [alreadyJoined, remoteUsers];
+  return [alreadyJoined, remoteUsers, token];
 }
